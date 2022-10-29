@@ -4,6 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.41.0",
+    "@typescript-eslint/parser": "^5.41.0",
     "eslint": "^8.26.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
@@ -16,6 +18,8 @@
     "*.js": "eslint --cache --fix"
   },
   "scripts": {
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "lint": "eslint . '*.{js,jsx,ts,tsx}'",
+    "prettify": "yarn prettier . --write '*.{js,jsx,ts,tsx,json}'"
   }
 }

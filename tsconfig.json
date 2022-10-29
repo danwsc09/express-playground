@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "incremental": true,
+    "checkJs": true,
+    "baseUrl": ".",
+    "module": "CommonJS",
+    "target": "esnext",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "paths": {
+      "@/*": ["src/*"],
+      "@config/*": ["config/*"]
+    },
+    "outDir": "ts-build",
+    "diagnostics": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "listEmittedFiles": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts", "**/*.spec.js"]
+}
