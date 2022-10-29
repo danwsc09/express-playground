@@ -1,0 +1,21 @@
+{
+  "name": "ts-node-boilerplate",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.26.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "husky": ">=7",
+    "lint-staged": ">=10",
+    "prettier": "^2.7.1",
+    "typescript": "^4.8.4"
+  },
+  "lint-staged": {
+    "*.js": "eslint --cache --fix"
+  },
+  "scripts": {
+    "prepare": "husky install"
+  }
+}
