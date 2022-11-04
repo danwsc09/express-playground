@@ -1,16 +1,23 @@
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS posts;
-DROP TABLE IF EXISTS comments;
-DROP TABLE IF EXISTS likes;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS posts CASCADE;
+DROP TABLE IF EXISTS comments CASCADE;
+DROP TABLE IF EXISTS likes CASCADE;
+
+DROP SEQUENCE IF EXISTS users_id_seq CASCADE;
+
+CREATE SEQUENCE users_id_seq;
 
 CREATE TABLE users (
-    id INT NOT NULL,
+    id INT NOT NULL DEFAULT nextval('users_id_seq'),
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(127) NOT NULL,
     created_on TIMESTAMP NOT NULL,
     last_login TIMESTAMPTZ,
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
+
+ALTER SEQUENCE users_id_seq
+OWNED BY users.id;
 
 CREATE TABLE posts (
     id serial PRIMARY KEY,

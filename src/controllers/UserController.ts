@@ -18,8 +18,18 @@ class UserController {
   }
 
   static async postUsers(req: IRequest, res: IResponse) {
+    console.log(req.body)
     const { email, password } = req.body
-    res.send('h')
+    try {
+      const hashedPassword = await bcypt.hash(password, 10)
+      const query = postUsersQuery(email, hashedPassword)
+      console.log(query)
+      const result = await pool.query(query)
+      console.log(result.rows)
+      res.sendStatus(201)
+    } catch {
+      res.sendStatus(500)
+    }
   }
 }
 
