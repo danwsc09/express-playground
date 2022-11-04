@@ -1,11 +1,11 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import { mountRoutes } from './routes'
-import logger from '@/middlewares'
+import { loggingMiddleware } from '@/middlewares'
 dotenv.config()
 
 const app = express()
-app.use(logger)
+app.use(loggingMiddleware)
 
 mountRoutes(app)
 

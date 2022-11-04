@@ -3,4 +3,4 @@ const loggingMiddleware = (req, res, next) => {
   next()
 }
 
-export default loggingMiddleware
+export { loggingMiddleware }

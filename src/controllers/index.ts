@@ -1,2 +1,3 @@
 import HomeController from './HomeController'
-export { HomeController }
+import UserController from './UserController'
+export { HomeController, UserController }
