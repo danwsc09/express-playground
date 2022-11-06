@@ -1,6 +1,2 @@
-const loggingMiddleware = (req, res, next) => {
-  console.log(Date.now())
-  next()
-}
-
-export { loggingMiddleware }
+export { loggingMiddleware } from '@/middlewares/timeLogger'
+export { authenticate } from '@/middlewares/authenticator'
