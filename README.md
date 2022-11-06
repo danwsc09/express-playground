@@ -1,13 +1,7 @@
-# Basic Settings
+# Anonymous Forum
 
-## Set up
+## Features
 
-- ESLint
-- TypeScript
-- Prettier
-- husky
-
-## To do
-
-- Testing (jest + ts-jest)
-- Add express and related libraries
+- Users can write posts and edit or delete them.
+- Non-users can read all posts.
+- The author of every post is "hidden" with asterisks
