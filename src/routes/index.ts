@@ -13,6 +13,7 @@ router.post(routes.login, UserController.login)
 
 router.get(routes.posts, PostController.getPosts)
 router.post(routes.posts, authenticate, PostController.createPost)
+router.delete(`${routes.posts}/:postId`, PostController.deletePost)
 
 export const mountRoutes = (express: Application): Application => {
   return express.use('/', router)
