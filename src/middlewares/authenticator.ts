@@ -19,15 +19,19 @@ export const authenticate = (
 
   const token = req.headers.authorization.split(' ')[1]
 
-  /*
-  const { exp, email }: { exp: number; email: string } = jwt.verify(
-    token,
-    process.env.JWT_SECRET
-  )
-  if (exp * 1000 < Date.now()) {
-    res.status(401).send({ message: 'token expired' })
+  try {
+    jwt.verify(token, process.env.JWT_SECRET)
+    /*
+    // const result = jwt.decode(token)
+    if ((result as { exp: number }).exp * 1000 < Date.now()) {
+      res.status(401).send({ message: 'token expired' })
+      return
+    }
+    */
+  } catch (err) {
+    res.status(401).send({ message: 'bad token' })
     return
   }
-  */
+
   next()
 }
