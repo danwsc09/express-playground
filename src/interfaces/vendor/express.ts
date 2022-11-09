@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
+import { UserWithId } from '../user'
 
-export type IRequest = Request
+export type IRequest = Request & {
+  user?: UserWithId
+}
 
 export type IResponse = Response
 

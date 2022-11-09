@@ -5,3 +5,8 @@ export interface User {
   created_on: string
   last_login: string | null
 }
+
+export interface UserWithId {
+  id: number
+  email: string
+}

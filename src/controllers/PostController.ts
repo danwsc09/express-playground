@@ -11,7 +11,7 @@ const findUserIdByEmail = (email: string) => ({
   values: [email],
 })
 
-const createPostQuery = (title: string, content: string, authorId: string) => ({
+const createPostQuery = (title: string, content: string, authorId: number) => ({
   text: 'INSERT INTO posts(author_id, create_date, content, title) VALUES($1, $2, $3, $4) RETURNING id',
   values: [authorId, new Date(), content, title],
 })
@@ -29,16 +29,13 @@ class UserController {
 
   static async createPost(req: IRequest, res: IResponse) {
     const { content, title } = req.body
-    const authHeader = req.headers.authorization
-    const email = getEmailFromToken(authHeader.split(' ')[1])
-    const userResult = await pool.query(findUserIdByEmail(email))
-
-    if (userResult.rowCount !== 1) {
-      res.status(401).json({ message: 'email not found' })
+    const { user } = req
+    if (!user) {
+      res.status(401).json({ message: 'you must be logged in' })
       return
     }
 
-    const userId = userResult.rows[0].id
+    const { email, id: userId } = user
 
     const result = await pool.query(createPostQuery(title, content, userId))
     const postId = result.rows[0].id

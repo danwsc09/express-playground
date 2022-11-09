@@ -55,7 +55,7 @@ class UserController {
         return
       }
 
-      const user: User = result.rows[0]
+      const user = result.rows[0] as User
       const isPasswordMatch = await bcypt.compare(password, user.password)
 
       if (!isPasswordMatch) {
@@ -64,7 +64,7 @@ class UserController {
       }
 
       // generate JWT and send back to user
-      const token = jwt.sign({ email }, process.env.JWT_SECRET, {
+      const token = jwt.sign({ email, id: user.id }, process.env.JWT_SECRET, {
         expiresIn: JWT_EXPIRES_IN,
       })
 
