@@ -27,7 +27,7 @@ const updatePostQuery = ({
   id,
   title,
 }: Omit<Post, 'create_date' | 'update_date'>) => ({
-  text: 'UPDATE posts SET content = $1, title = $2, update_date = NOW() WHERE id = $4 AND author_id = $4 RETURNING id',
+  text: 'UPDATE posts SET content = $1, title = $2, update_date = NOW() WHERE id = $3 AND author_id = $4 RETURNING id',
   values: [content, title, id, author_id],
 })
 
@@ -114,9 +114,7 @@ class UserController {
     }
 
     try {
-      console.log('updated:', updatedPost)
       const q = updatePostQuery(updatedPost)
-      console.log('query:', q)
       const result = await pool.query(q)
 
       if (result.rowCount !== 1) {
