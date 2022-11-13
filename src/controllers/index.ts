@@ -1,4 +1,5 @@
 import HomeController from './HomeController'
 import UserController from './UserController'
 import PostController from './PostController'
-export { HomeController, UserController, PostController }
+import CommentController from './CommentController'
+export { HomeController, UserController, PostController, CommentController }

@@ -41,6 +41,8 @@ CREATE TABLE comments (
     content TEXT,
     user_id INT,
     post_id INT,
+    create_date TIMESTAMPTZ NOT NULL,
+    update_date TIMESTAMPTZ,
     CONSTRAINT "comments_pkey" PRIMARY KEY ("id"),
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (post_id) REFERENCES posts (id)

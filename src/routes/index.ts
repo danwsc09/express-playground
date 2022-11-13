@@ -1,4 +1,9 @@
-import { HomeController, PostController, UserController } from '@/controllers'
+import {
+  CommentController,
+  HomeController,
+  PostController,
+  UserController,
+} from '@/controllers'
 import { authenticate } from '@/middlewares'
 import { Router, Application } from 'express'
 import { routes } from './constants'
@@ -19,6 +24,13 @@ router.delete(
   PostController.deletePost
 )
 router.put(`${routes.posts}/:postId`, authenticate, PostController.editPost)
+
+router.get(`${routes.comments}/:postId`, CommentController.getComments)
+router.post(
+  `${routes.comments}/:postId`,
+  authenticate,
+  CommentController.createComment
+)
 
 export const mountRoutes = (express: Application): Application => {
   return express.use('/', router)
