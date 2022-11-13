@@ -8,3 +8,7 @@ export type IRequest = Request & {
 export type IResponse = Response
 
 export type INextFunction = NextFunction
+
+export type IError = Error & {
+  type: string
+}

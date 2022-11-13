@@ -1,5 +1,10 @@
 // Vendor
-export { IRequest, IResponse, INextFunction } from '@/interfaces/vendor/express'
+export {
+  IRequest,
+  IResponse,
+  INextFunction,
+  IError,
+} from '@/interfaces/vendor/express'
 
 // Models
 export { User, UserWithId } from '@/interfaces/user'
