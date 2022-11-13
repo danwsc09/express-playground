@@ -18,7 +18,6 @@ const createComment = ({
 })
 
 class CommentController {
-  // TODO: write the comment API
   static async getComments(req: IRequest, res: IResponse) {
     const { postId } = req.params
     if (isNaN(+postId)) {

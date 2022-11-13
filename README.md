@@ -10,3 +10,4 @@
 
 - Logout functionality
 - Comments API
+- Error handling middleware(s) from [link](https://scoutapm.com/blog/express-error-handling)
