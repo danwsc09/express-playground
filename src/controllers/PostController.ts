@@ -1,7 +1,13 @@
 import pool from '@/db'
-import { INextFunction, IRequest, IResponse, Post, User } from '@/interfaces'
+import {
+  HttpException,
+  INextFunction,
+  IRequest,
+  IResponse,
+  Post,
+  User,
+} from '@/interfaces'
 import { getEmailFromToken } from '@/utils/getEmailFromToken'
-import { isNamedExportBindings } from 'typescript'
 
 const readPostsQuery = {
   text: 'SELECT * FROM POSTS',
@@ -33,9 +39,13 @@ const updatePostQuery = ({
 })
 
 class UserController {
-  static async getPosts(req: IRequest, res: IResponse) {
-    const result = await pool.query(readPostsQuery)
-    res.send(result.rows)
+  static async getPosts(req: IRequest, res: IResponse, next: INextFunction) {
+    try {
+      const result = await pool.query(readPostsQuery)
+      res.send(result.rows)
+    } catch {
+      next(new HttpException(500, 'Error while reading post'))
+    }
   }
 
   static async createPost(req: IRequest, res: IResponse, next: INextFunction) {
@@ -54,63 +64,77 @@ class UserController {
         content,
       })
     } catch (err) {
-      next(err)
+      next(new HttpException(500, 'Error while creating post'))
     }
   }
 
-  static async deletePost(req: IRequest, res: IResponse) {
+  static async deletePost(req: IRequest, res: IResponse, next: INextFunction) {
     const { postId } = req.params
     if (isNaN(+postId)) {
-      res.status(400).send({ message: 'invalid post id' })
+      next(new HttpException(400, 'Invalid post id'))
       return
     }
 
     const authHeader = req.headers.authorization
     const email = getEmailFromToken(authHeader.split(' ')[1])
-    const userResult = await pool.query(findUserIdByEmail(email))
 
-    if (userResult.rowCount !== 1) {
-      res.status(401).json({ message: 'email not found' })
-      return
+    let userResult
+    try {
+      userResult = await pool.query(findUserIdByEmail(email))
+      if (userResult.rowCount !== 1) {
+        next(new HttpException(401, 'Email not found'))
+        return
+      }
+    } catch {
+      next(new HttpException(500, 'Error while reading email'))
     }
 
     const userId = userResult.rows[0].id
+    try {
+      const result = await pool.query(deletePostQuery(+postId, userId))
 
-    const result = await pool.query(deletePostQuery(+postId, userId))
+      if (result.rowCount === 0) {
+        next(new HttpException(400, 'post not found'))
+        return
+      }
 
-    if (result.rowCount === 0) {
-      res.status(400).json({ message: 'post not found' })
-      return
+      res.sendStatus(200)
+    } catch {
+      next(new HttpException(500, 'Error while deleting post'))
     }
-
-    res.sendStatus(200)
   }
 
-  static async editPost(req: IRequest, res: IResponse) {
+  static async editPost(req: IRequest, res: IResponse, next: INextFunction) {
     const { content, title } = req.body
     const { postId } = req.params
+
     if (isNaN(+postId)) {
-      res.status(400).send({ message: 'invalid post id' })
+      next(new HttpException(400, 'Invalid post id'))
       return
     }
 
     const authHeader = req.headers.authorization
     const email = getEmailFromToken(authHeader.split(' ')[1])
-    const userResult = await pool.query(findUserIdByEmail(email))
+    let userResult
 
-    if (userResult.rowCount !== 1) {
-      res.status(401).json({ message: 'email not found' })
+    try {
+      userResult = await pool.query(findUserIdByEmail(email))
+
+      if (userResult.rowCount !== 1) {
+        next(new HttpException(401, 'Email not found'))
+        return
+      }
+    } catch {
+      next(new HttpException(500, 'Cant find email given id'))
       return
     }
 
     const userId = userResult.rows[0].id
-    // const currentDate = new Date()
     const updatedPost = {
       id: +postId,
       author_id: userId,
       content,
       title,
-      // update_date: currentDate,
     }
 
     try {
@@ -118,12 +142,11 @@ class UserController {
       const result = await pool.query(q)
 
       if (result.rowCount !== 1) {
-        res.status(401).json({ message: 'bad request' })
+        next(new HttpException(401, 'Bad request'))
         return
       }
     } catch (err) {
-      console.log(err)
-      res.sendStatus(500)
+      next(new HttpException(500, 'Error while updating post'))
       return
     }
     res.sendStatus(200)
