@@ -1,5 +1,5 @@
 import { INextFunction, IRequest, IResponse } from '@/interfaces'
-import { UnauthorizedError } from '@/interfaces/errors'
+import { HttpException } from '@/interfaces'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 
 export const authenticate = (
@@ -11,7 +11,7 @@ export const authenticate = (
     !req.headers.authorization ||
     !req.headers.authorization.startsWith('Bearer ')
   ) {
-    const err = new UnauthorizedError()
+    const err = new HttpException(400, 'You must be logged in!')
     next(err)
     return
   }
@@ -27,7 +27,7 @@ export const authenticate = (
     req.user = user
     next()
   } catch (err) {
-    const error = new UnauthorizedError('Invalid token!!')
+    const error = new HttpException(400, 'Invalid token!!')
     next(error)
   }
 }

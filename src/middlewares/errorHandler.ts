@@ -1,5 +1,5 @@
 import { INextFunction, IRequest, IResponse, IError } from '@/interfaces'
-import { BaseError } from '@/interfaces/errors'
+import { HttpException } from '@/interfaces'
 
 export const errorLogger = (
   err: IError,
@@ -12,14 +12,13 @@ export const errorLogger = (
 }
 
 export const errorResponder = (
-  err: BaseError,
+  err: HttpException,
   req: IRequest,
   res: IResponse,
   next: INextFunction
 ) => {
-  // res.status(err.statusCode).send(err.message)
   // res.header('Content-Type', 'application/json')
-  res.status(err.statusCode).send(JSON.stringify(err, null, 4)) // pretty print
+  res.status(err.status).send(JSON.stringify(err, null, 4))
 }
 
 export const failSafeHandler = (

@@ -13,10 +13,10 @@ const app = express()
 app.use(express.json())
 app.use(loggingMiddleware)
 
+mountRoutes(app)
+
 app.use(errorLogger)
 app.use(errorResponder)
 app.use(failSafeHandler)
-
-mountRoutes(app)
 
 export default app
