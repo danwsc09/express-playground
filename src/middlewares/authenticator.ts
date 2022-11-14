@@ -1,4 +1,5 @@
 import { INextFunction, IRequest, IResponse } from '@/interfaces'
+import { UnauthorizedError } from '@/interfaces/errors'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 
 export const authenticate = (
@@ -6,13 +7,12 @@ export const authenticate = (
   res: IResponse,
   next: INextFunction
 ) => {
-  if (!req.headers.authorization) {
-    res.status(401).send({ message: 'you must be authenticated' })
-    return
-  }
-
-  if (!req.headers.authorization.startsWith('Bearer ')) {
-    res.status(401).send({ message: 'invalid token' })
+  if (
+    !req.headers.authorization ||
+    !req.headers.authorization.startsWith('Bearer ')
+  ) {
+    const err = new UnauthorizedError()
+    next(err)
     return
   }
 
@@ -25,17 +25,9 @@ export const authenticate = (
     ) as JwtPayload
     const user = { email, id }
     req.user = user
-    /*
-    // const result = jwt.decode(token)
-    if ((result as { exp: number }).exp * 1000 < Date.now()) {
-      res.status(401).send({ message: 'token expired' })
-      return
-    }
-    */
+    next()
   } catch (err) {
-    res.status(401).send({ message: 'bad token' })
-    return
+    const error = new UnauthorizedError('Invalid token!!')
+    next(error)
   }
-
-  next()
 }

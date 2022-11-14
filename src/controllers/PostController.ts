@@ -1,6 +1,7 @@
 import pool from '@/db'
-import { IRequest, IResponse, Post } from '@/interfaces'
+import { INextFunction, IRequest, IResponse, Post, User } from '@/interfaces'
 import { getEmailFromToken } from '@/utils/getEmailFromToken'
+import { isNamedExportBindings } from 'typescript'
 
 const readPostsQuery = {
   text: 'SELECT * FROM POSTS',
@@ -12,7 +13,7 @@ const findUserIdByEmail = (email: string) => ({
 })
 
 const createPostQuery = (title: string, content: string, authorId: number) => ({
-  text: 'INSERT INTO posts(author_id, create_date, content, title) VALUES($1, $2, $3, $4)',
+  text: 'INSERT INTO posts(author_id, create_date, content, title) VALUES($1, $2, $3, $4) returning id',
   values: [authorId, new Date(), content, title],
 })
 
@@ -37,25 +38,24 @@ class UserController {
     res.send(result.rows)
   }
 
-  static async createPost(req: IRequest, res: IResponse) {
+  static async createPost(req: IRequest, res: IResponse, next: INextFunction) {
     const { content, title } = req.body
-    const { user } = req
-    if (!user) {
-      res.status(401).json({ message: 'you must be logged in' })
-      return
-    }
+    const user = req.user as User
 
     const { email, id: userId } = user
+    try {
+      const result = await pool.query(createPostQuery(title, content, userId))
+      const postId = result.rows[0].id
 
-    const result = await pool.query(createPostQuery(title, content, userId))
-    const postId = result.rows[0].id
-
-    res.status(201).json({
-      id: postId,
-      email,
-      title,
-      content,
-    })
+      res.status(201).json({
+        id: postId,
+        email,
+        title,
+        content,
+      })
+    } catch (err) {
+      next(err)
+    }
   }
 
   static async deletePost(req: IRequest, res: IResponse) {
