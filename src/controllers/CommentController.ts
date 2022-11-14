@@ -1,5 +1,11 @@
 import pool from '@/db'
-import { IRequest, IResponse } from '@/interfaces'
+import {
+  HttpException,
+  INextFunction,
+  IRequest,
+  IResponse,
+  User,
+} from '@/interfaces'
 import { Comment } from '@/interfaces/comment'
 
 const getCommentsByPostIdQuery = (postId: number) => ({
@@ -18,38 +24,45 @@ const createComment = ({
 })
 
 class CommentController {
-  static async getComments(req: IRequest, res: IResponse) {
+  static async getComments(req: IRequest, res: IResponse, next: INextFunction) {
     const { postId } = req.params
     if (isNaN(+postId)) {
-      res.status(400).json({ message: 'invalid post id' })
+      next(new HttpException(400, 'Invalid post id'))
       return
     }
 
-    const result = await pool.query(getCommentsByPostIdQuery(+postId))
-
-    res.json(result.rows)
-    return
+    try {
+      const result = await pool.query(getCommentsByPostIdQuery(+postId))
+      res.json(result.rows)
+    } catch {
+      next(new HttpException(500, 'Error while retrieving comments'))
+    }
   }
 
-  static async createComment(req: IRequest, res: IResponse) {
+  static async createComment(
+    req: IRequest,
+    res: IResponse,
+    next: INextFunction
+  ) {
     const { postId } = req.params
     const { content } = req.body
-    const { user } = req
-
-    if (!user) {
-      res.status(401).json({ message: 'you must be logged in' })
-      return
-    }
+    const user = req.user as User
 
     const now = new Date()
-    const result = await pool.query(
-      createComment({
-        content,
-        author_id: user.id,
-        post_id: +postId,
-        create_date: now,
-      })
-    )
+    let result
+    try {
+      result = await pool.query(
+        createComment({
+          content,
+          author_id: user.id,
+          post_id: +postId,
+          create_date: now,
+        })
+      )
+    } catch {
+      next(new HttpException(500, 'Error while creating comment'))
+      return
+    }
     const newComment: Comment = {
       author_id: user.id,
       content,
